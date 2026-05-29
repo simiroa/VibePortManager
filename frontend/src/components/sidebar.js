@@ -30,8 +30,17 @@ function render(el) {
   const filter   = getProjectFilter()
 
   el.innerHTML = `
+    <!-- Top actions -->
+    <div class="shrink-0 px-2 pt-2 pb-1 space-y-0.5">
+      <button data-nav="add-project"
+        class="w-full text-left px-3 py-2 rounded text-sm text-indigo-400
+               hover:bg-indigo-900/30 hover:text-indigo-300 transition-colors font-medium">
+        + Add Project
+      </button>
+    </div>
+
     <!-- All -->
-    <div class="px-2 pt-2">
+    <div class="px-2 pt-1">
       <button data-nav="all"
         class="w-full text-left px-3 py-2 rounded text-sm transition-colors
           ${filter === null
@@ -54,11 +63,6 @@ function render(el) {
         class="w-full text-left px-3 py-2 rounded text-sm text-gray-400
                hover:bg-gray-800 hover:text-gray-200 transition-colors">
         🔌 System Ports
-      </button>
-      <button data-nav="add-project"
-        class="w-full text-left px-3 py-2 rounded text-sm text-indigo-400
-               hover:bg-indigo-900/30 hover:text-indigo-300 transition-colors">
-        + Add Project
       </button>
     </div>
   `

@@ -107,9 +107,14 @@ function renderTopBar(filter) {
   if (!proj) return ''
   return `
     <div class="px-4 pt-4 pb-2 flex items-start justify-between gap-3">
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         <h2 class="text-sm font-semibold text-gray-100 truncate">${esc(proj.name)}</h2>
-        <p class="mono text-xs text-gray-500 truncate mt-0.5">${esc(proj.path ?? '')}</p>
+        <button data-action="copy-path" data-path="${esc(proj.path ?? '')}"
+          title="Click to copy path"
+          class="mono text-xs text-gray-500 hover:text-indigo-400 truncate mt-0.5 cursor-pointer
+                 max-w-full transition-colors hover:bg-gray-800/50 px-1.5 py-0.5 rounded">
+          ${esc(proj.path ?? '')}
+        </button>
         ${proj.packageManager && proj.packageManager !== 'none'
           ? `<span class="inline-block mt-1 text-xs text-indigo-400 bg-indigo-900/40 rounded px-1.5 py-0.5">${esc(proj.packageManager)}</span>`
           : ''}
@@ -298,6 +303,21 @@ async function handleAction(e) {
     case 'add-project':
       document.querySelector('[data-nav="add-project"]')?.click()
       break
+
+    case 'copy-path': {
+      const path = btn.dataset.path
+      if (path) {
+        navigator.clipboard.writeText(path).then(() => {
+          btn.textContent = '✓ Copied!'
+          btn.classList.add('bg-green-900/40', 'text-green-300')
+          setTimeout(() => {
+            btn.textContent = path
+            btn.classList.remove('bg-green-900/40', 'text-green-300')
+          }, 2000)
+        })
+      }
+      break
+    }
 
     case 'start':
       if (serverID) try { await StartServer(serverID) } catch (err) { await showError('Start failed', err?.message) }
