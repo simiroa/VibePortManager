@@ -66,3 +66,95 @@ body {
 #log-output {
   @apply font-mono text-xs text-green-300 whitespace-pre-wrap;
 }
+
+/* ═════════════════════════════════════════════════════════════════
+   Light mode overrides — html:not(.dark) selector
+   Maps all gray-N classes to light equivalents (slate palette)
+   ═════════════════════════════════════════════════════════════════ */
+
+html:not(.dark) body {
+  @apply bg-slate-50 text-slate-900;
+}
+
+/* Background colors */
+html:not(.dark) .bg-gray-950 { @apply bg-slate-50; }
+html:not(.dark) .bg-gray-900 { @apply bg-white; }
+html:not(.dark) .bg-gray-800 { @apply bg-slate-100; }
+html:not(.dark) .bg-gray-700 { @apply bg-slate-200; }
+html:not(.dark) .bg-gray-600 { @apply bg-slate-300; }
+
+/* Hover background states */
+html:not(.dark) .hover\:bg-gray-900:hover { @apply bg-slate-50; }
+html:not(.dark) .hover\:bg-gray-800:hover { @apply bg-slate-100; }
+html:not(.dark) .hover\:bg-gray-700:hover { @apply bg-slate-200; }
+html:not(.dark) .hover\:bg-gray-600:hover { @apply bg-slate-300; }
+
+/* Opacity backgrounds */
+html:not(.dark) .bg-gray-900\/50 { background-color: rgb(255 255 255 / 0.5); }
+html:not(.dark) .bg-gray-900\/30 { background-color: rgb(255 255 255 / 0.3); }
+html:not(.dark) .bg-gray-900\/40 { background-color: rgb(255 255 255 / 0.4); }
+html:not(.dark) .bg-gray-800\/30 { background-color: rgb(241 245 249 / 0.3); }
+html:not(.dark) .bg-gray-800\/40 { background-color: rgb(241 245 249 / 0.4); }
+html:not(.dark) .bg-gray-800\/50 { background-color: rgb(241 245 249 / 0.5); }
+html:not(.dark) .bg-gray-800\/60 { background-color: rgb(241 245 249 / 0.6); }
+html:not(.dark) .hover\:bg-gray-800\/50:hover { background-color: rgb(241 245 249 / 0.5); }
+html:not(.dark) .hover\:bg-gray-800\/60:hover { background-color: rgb(241 245 249 / 0.6); }
+
+/* Text colors */
+html:not(.dark) .text-gray-100 { @apply text-slate-900; }
+html:not(.dark) .text-gray-200 { @apply text-slate-800; }
+html:not(.dark) .text-gray-300 { @apply text-slate-700; }
+html:not(.dark) .text-gray-400 { @apply text-slate-500; }
+html:not(.dark) .text-gray-500 { @apply text-slate-500; }
+html:not(.dark) .text-gray-600 { @apply text-slate-500; }
+
+/* Hover text colors */
+html:not(.dark) .hover\:text-gray-100:hover { @apply text-slate-900; }
+html:not(.dark) .hover\:text-gray-200:hover { @apply text-slate-800; }
+html:not(.dark) .hover\:text-gray-300:hover { @apply text-slate-700; }
+
+/* Border colors */
+html:not(.dark) .border-gray-800 { @apply border-slate-200; }
+html:not(.dark) .border-gray-700 { @apply border-slate-300; }
+html:not(.dark) .border-gray-600 { @apply border-slate-400; }
+html:not(.dark) .divide-gray-800 > * + * { @apply divide-slate-200; }
+
+/* Placeholder text */
+html:not(.dark) .placeholder-gray-500::placeholder { @apply placeholder-slate-500; }
+html:not(.dark) .placeholder-gray-600::placeholder { @apply placeholder-slate-400; }
+
+/* Button styling */
+html:not(.dark) .tb-btn {
+  @apply text-slate-600 hover:bg-slate-200 hover:text-slate-900;
+}
+
+html:not(.dark) .tab-btn {
+  @apply text-slate-600 border-slate-300 hover:text-slate-800 hover:border-slate-400;
+}
+
+html:not(.dark) .btn-gray,
+html:not(.dark) .btn-ghost {
+  @apply bg-slate-200 hover:bg-slate-300 text-slate-900;
+}
+
+html:not(.dark) .btn-disabled {
+  @apply bg-slate-200 text-slate-400;
+}
+
+html:not(.dark) .input {
+  @apply bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:border-indigo-500;
+}
+
+html:not(.dark) .card {
+  @apply bg-white border-slate-200;
+}
+
+/* Log output */
+html:not(.dark) #log-output {
+  @apply text-green-700;
+}
+
+/* Focus ring */
+html:not(.dark) .focus\:border-indigo-500:focus {
+  @apply border-indigo-500;
+}
