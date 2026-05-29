@@ -5,7 +5,8 @@
 
 import { ScanSystemPorts, KillByPort } from '../wails.js'
 import { showModal } from '../modal.js'
-import { getProjects } from '../store.js'
+import { getProjects, findProjectByServer } from '../store.js'
+import { setProjectFilter } from '../state.js'
 
 export async function openSystemPorts() {
   const promise = showModal({
@@ -48,24 +49,87 @@ async function refresh() {
     </div>
   `
   document.getElementById('sp-rescan')?.addEventListener('click', refresh)
+  body.querySelectorAll('[data-port-info]').forEach(row =>
+    row.addEventListener('click', e => {
+      if (e.target.closest('[data-kill-port], [data-confirm-kill], [data-cancel-kill]')) return
+      onPortRowClick(JSON.parse(row.dataset.portInfo))
+    }))
   body.querySelectorAll('[data-kill-port]').forEach(btn =>
     btn.addEventListener('click', () => onKillClick(btn)))
 }
 
 const rowHTML = managed => e => `
-  <div class="flex items-center gap-2 px-3 py-1.5 text-xs">
-    <span class="mono text-indigo-300 w-14 shrink-0">:${e.port}</span>
+  <div class="flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-gray-800/50 transition-colors"
+       data-port-info='${JSON.stringify({port: e.port, processName: e.processName, pid: e.pid, backendId: e.backendId})}'>
+    <span class="mono text-indigo-300 w-14 shrink-0 font-semibold">:${e.port}</span>
     <span class="text-gray-300 flex-1 truncate">
       ${esc(e.processName || '?')} <span class="text-gray-600">pid ${e.pid}</span>
     </span>
-    <span class="text-gray-600 shrink-0">${esc(shortBackend(e.backendId))}</span>
-    ${managed.has(e.port) ? `<span class="text-amber-400 shrink-0" title="Managed by VPM">managed</span>` : ''}
+    <span class="text-gray-600 shrink-0 text-[10px]">${esc(shortBackend(e.backendId))}</span>
+    ${managed.has(e.port) ? `<span class="text-amber-400 shrink-0 text-[10px]" title="Managed by VPM">managed</span>` : ''}
     <span class="kill-slot shrink-0 flex items-center gap-1">
       <button data-kill-port="${e.port}"
         class="text-red-400 hover:text-red-300 px-1.5 py-0.5 rounded hover:bg-red-900/30 transition-colors">Kill</button>
     </span>
   </div>
 `
+
+function onPortRowClick(info) {
+  const { port, processName, pid, backendId } = info
+  if (!port) return
+
+  // Find if any VPM server is on this port
+  const managedServer = Array.from(getProjects())
+    .flatMap(p => (p.servers ?? []).map(s => ({ ...s, projectId: p.id })))
+    .find(s => s.port === port)
+
+  const managerLabel = managedServer
+    ? `${managedServer.name} (${getProjects().find(p => p.id === managedServer.projectId)?.name})`
+    : 'Not managed by VPM'
+
+  const content = `
+    <div class="space-y-2 mt-2 text-sm">
+      <div>
+        <p class="text-xs text-gray-500">Port</p>
+        <p class="mono text-indigo-300 font-semibold">:${port}</p>
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">Process</p>
+        <p class="text-gray-100">${esc(processName || '?')} (PID ${pid})</p>
+      </div>
+      <div>
+        <p class="text-xs text-gray-500">Backend</p>
+        <p class="text-gray-100">${esc(shortBackend(backendId))}</p>
+      </div>
+      <div class="border-t border-gray-700 pt-2">
+        <p class="text-xs text-gray-500">VPM Status</p>
+        <p class="text-gray-100">${managerLabel}</p>
+      </div>
+    </div>
+  `
+
+  const actions = managedServer
+    ? [
+        { label: 'Go to Project', value: 'goto', style: 'btn-primary' },
+        { label: 'Close', value: 'close', style: 'btn-ghost' },
+      ]
+    : [
+        { label: 'Close', value: 'close', style: 'btn-ghost' },
+      ]
+
+  showModal({
+    title: `Port :${port}`,
+    message: '',
+    formContent: content,
+    actions,
+  }).then(result => {
+    if (result === 'goto' && managedServer) {
+      setProjectFilter(managedServer.projectId)
+      // Close the System Ports modal by simulating close button click
+      document.querySelector('[data-nav="system-ports"]')?.click()
+    }
+  })
+}
 
 function onKillClick(btn) {
   const slot = btn.closest('.kill-slot')
