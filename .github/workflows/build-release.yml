@@ -21,6 +21,10 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install Wails
+        run: |
+          go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
       - name: Install dependencies
         run: |
           cd frontend
@@ -33,6 +37,7 @@ jobs:
 
       - name: Build Windows executable
         run: |
+          $env:PATH = "$env:GOPATH\bin;$env:PATH"
           wails build -platform windows -output vibe-port-manager.exe
 
       - name: Create Release
