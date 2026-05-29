@@ -1,0 +1,39 @@
+# Wails
+frontend/dist/
+frontend/node_modules/
+build/
+
+# Go
+*.exe
+*.dll
+*.so
+*.dylib
+bin/
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local env
+.env
+.env.local
+
+# Build artifacts
+*.o
+*.a
+.tox/
+coverage.out
+
+# Lazyweb design reports
+.lazyweb/
+
+# Dependencies
+vendor/

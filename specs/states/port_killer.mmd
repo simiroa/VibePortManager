@@ -1,0 +1,16 @@
+%% Triple-Pass Port Killer 상태머신 (plan.md §2.2)
+%% internal/portkiller가 이 다이어그램의 상태/전이와 1:1 일치해야 함
+stateDiagram-v2
+    [*] --> GracefulSent
+    GracefulSent --> Polling: signal dispatched
+    Polling --> Polling: port still occupied (count < 3)
+    Polling --> Released: port free
+    Polling --> ResolveBlocker: 3 polls done, still occupied
+    ResolveBlocker --> ForceKill: same-target PID resolved
+    ResolveBlocker --> CrossTargetReport: cross-target PID
+    ResolveBlocker --> UnknownBlocker: resolution failed
+    ForceKill --> Released: kill success
+    ForceKill --> UnknownBlocker: kill failed (privilege)
+    CrossTargetReport --> [*]: surface to UI, no kill
+    UnknownBlocker --> [*]: surface to UI, modal
+    Released --> [*]

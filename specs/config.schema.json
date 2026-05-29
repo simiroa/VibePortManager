@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vpm.config.v1",
+  "title": "VPM User Config",
+  "description": "%APPDATA%/vpm/config.json 스키마. scripts/gen-types.go가 Go struct 생성.",
+  "type": "object",
+  "required": ["version", "projects", "settings"],
+  "properties": {
+    "version": { "type": "integer", "const": 1 },
+    "settings": {
+      "type": "object",
+      "required": ["autostart_vpm", "close_warning_seen"],
+      "properties": {
+        "autostart_vpm": { "type": "boolean", "default": false },
+        "close_warning_seen": { "type": "boolean", "default": false },
+        "shell_override": {
+          "type": "object",
+          "description": "execution_target_id -> 셸 명령 오버라이드",
+          "additionalProperties": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Project" }
+    }
+  },
+  "$defs": {
+    "Project": {
+      "type": "object",
+      "required": ["id", "name", "path", "execution_target", "package_manager", "servers"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "name": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "description": "Project 디렉토리 절대경로 (UNC 가능)" },
+        "execution_target": {
+          "type": "string",
+          "enum": ["windows-native", "wsl", "linux-native"]
+        },
+        "wsl_distro": {
+          "type": "string",
+          "description": "execution_target=wsl일 때만"
+        },
+        "package_manager": {
+          "type": "string",
+          "enum": ["npm", "yarn", "pnpm", "bun", "none"]
+        },
+        "servers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Server" }
+        }
+      }
+    },
+    "Server": {
+      "type": "object",
+      "required": ["id", "name", "command", "port", "autostart"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "name": { "type": "string", "minLength": 1 },
+        "command": {
+          "type": "string",
+          "description": "Start 시 실행할 명령. {PORT} 플레이스홀더 권장."
+        },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "autostart": {
+          "type": "boolean",
+          "default": false,
+          "description": "VPM 부팅 시 자동 Start"
+        },
+        "autorestart": {
+          "type": "boolean",
+          "default": false,
+          "description": "비정상(크래시) 종료 시 자동 재시작 (crash-loop 상한 적용)"
+        }
+      }
+    }
+  }
+}

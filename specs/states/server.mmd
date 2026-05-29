@@ -1,0 +1,21 @@
+%% Server 상태머신 (CONTEXT.md "Server 상태" 절)
+%% internal/server의 상태 enum과 1:1 일치
+stateDiagram-v2
+    [*] --> STOPPED
+    STOPPED --> STARTING: StartServer()
+    STARTING --> RUNNING: child spawned + port bound
+    STARTING --> PORT_COLLISION: pre-start port check fail
+    STARTING --> ERROR: spawn fail
+    RUNNING --> STOPPING: StopServer()
+    RUNNING --> ERROR: child exit unexpected
+    STOPPING --> STOPPED: Triple-Pass complete
+    STOPPING --> ERROR: kill ultimately failed
+    PORT_COLLISION --> STARTING: user accepts §2.6 wizard (force kill or reassign)
+    PORT_COLLISION --> STOPPED: user cancels
+    ERROR --> STOPPED: user dismiss
+    ERROR --> STARTING: user retry
+
+    note right of STARTING
+        Buttons disabled during STARTING/STOPPING.
+        No queuing, no cancellation.
+    end note

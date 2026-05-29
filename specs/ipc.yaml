@@ -1,0 +1,116 @@
+# VPM SSOT — Wails 바인딩 메서드 카탈로그
+# 프론트 ↔ 백 간 모든 호출 시그니처. app.go의 메서드와 1:1 일치 (validate-specs 검증).
+
+# 타입 별칭 (Go struct + TS interface로 자동 생성 대상)
+types:
+  ProjectID: string
+  ServerID: string
+  ExecutionTarget: 'windows-native | wsl | linux-native'
+  ServerState: 'STOPPED | STARTING | RUNNING | STOPPING | PORT_COLLISION | ERROR'
+  ProjectAnalysis: '{ port: int|null, command: string, scriptName: string, packageMgr: string }'
+
+# 백엔드 호출 (Wails Bind 메서드)
+methods:
+  # Project CRUD
+  - name: ListProjects
+    in: []
+    out: '[]Project'
+
+  - name: AddProject
+    in:
+      - { name: path, type: string }
+      - { name: displayName, type: string }
+      - { name: executionTargetOverride, type: '*ExecutionTarget' }
+    out: 'Project | error'
+
+  - name: RemoveProject
+    in: [{ name: id, type: ProjectID }]
+    out: error
+
+  # WSL distro 목록
+  - name: ListWSLDistros
+    in: []
+    out: '[]string'
+
+  # Server CRUD
+  - name: AddServer
+    in:
+      - { name: projectID, type: ProjectID }
+      - { name: server, type: Server }
+    out: 'Server | error'
+
+  - name: UpdateServer
+    in:
+      - { name: projectID, type: ProjectID }
+      - { name: server, type: Server }
+    out: error
+
+  - name: RemoveServer
+    in:
+      - { name: projectID, type: ProjectID }
+      - { name: serverID, type: ServerID }
+    out: error
+
+  # Lifecycle
+  - name: StartServer
+    in: [{ name: serverID, type: ServerID }]
+    out: error
+  - name: StopServer
+    in: [{ name: serverID, type: ServerID }]
+    out: error
+  - name: RestartServer
+    in: [{ name: serverID, type: ServerID }]
+    out: error
+  - name: ResyncServerPort
+    in: [{ name: serverID, type: ServerID }]
+    out: 'int | error'  # re-detect actual LISTEN port of a VPM-spawned server
+
+  # Port 스캔/킬
+  - name: ScanSystemPorts
+    in: []
+    out: '[]PortEntry'
+  - name: KillByPort
+    in: [{ name: port, type: int }]
+    out: error
+  - name: SuggestFreePort
+    in: [{ name: startFrom, type: int }]
+    out: int
+
+  # Log
+  - name: GetRecentLogs
+    in:
+      - { name: serverID, type: ServerID }
+      - { name: maxLines, type: int }
+    out: '[]string'
+  - name: ExportLogs
+    in:
+      - { name: projectID, type: ProjectID }
+      - { name: destPath, type: string }
+    out: error
+
+  # Stats
+  - name: GetSystemStats
+    in: []
+    out: '{ ramMB: float64, runningCount: int, activePortCount: int }'
+
+  # Project analysis + Detection Mode
+  - name: AnalyzeProject
+    in: [{ name: path, type: string }]
+    out: ProjectAnalysis
+  - name: GetListeningPorts
+    in: []
+    out: '[]int | error'
+
+  # Autostart
+  - name: SetAutostart
+    in: [{ name: enable, type: bool }]
+    out: error
+
+# Wails 이벤트 (백 → 프론트)
+events:
+  - name: server.state.changed
+    payload: '{ serverID: ServerID, state: ServerState, error?: string }'
+  - name: server.log.batch
+    payload: '{ serverID: ServerID, lines: []string }'  # 100ms 배치
+  - name: collision.detected
+    payload: '{ serverID: ServerID, origin: "same-target"|"cross-target"|"unknown", blockingPID?: int, blockingDescription?: string, suggestedFreePort?: int }'

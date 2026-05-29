@@ -1,0 +1,63 @@
+# VPM SSOT — 앱 메타 + 성능/플랫폼 제약
+# 이 파일 변경 = 아키텍처 결정. validate-specs.go 통과 필수.
+
+name: vibe-port-manager
+display_name: Vibe Port Manager
+version: 0.1.0
+
+# 빌드 타깃
+targets:
+  primary:
+    - windows/amd64
+  secondary:
+    - linux/amd64        # future, best-effort
+  excluded:
+    - darwin/*           # MVP 스코프 밖
+
+# 성능 SLO (CI 게이트)
+slo:
+  exe_size_max_mb: 15
+  idle_ram_max_mb: 80    # Wails v2 + WebView2 baseline ~65 MB; 30 MB unreachable with embedded Chromium
+  listening_ports: 0    # 로컬 웹서버 금지. net.Listen grep으로 검증
+
+# Execution Target (CONTEXT.md 참조)
+execution_targets:
+  - id: windows-native
+    shell_command: ['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command']
+    inner_wrapper: 'cmd /c'
+  - id: wsl
+    detect_prefix: ['\\wsl$\', '\\wsl.localhost\']
+    shell_command: ['wsl.exe', '-d', '{distro}', '--', 'bash', '-ilc']
+
+# Lock file → package manager 매핑 (Tab 1 자동 감지)
+package_manager_detection:
+  - lock: bun.lockb
+    pm: bun
+    default_cmd: 'bun dev'
+  - lock: pnpm-lock.yaml
+    pm: pnpm
+    default_cmd: 'pnpm dev'
+  - lock: yarn.lock
+    pm: yarn
+    default_cmd: 'yarn dev'
+  - lock: package-lock.json
+    pm: npm
+    default_cmd: 'npm run dev'
+
+# Triple-Pass Port Killer 파라미터
+port_killer:
+  poll_count: 3
+  poll_interval_ms: 500
+  total_grace_ms: 1500   # poll_count * poll_interval_ms
+
+# Log 정책
+log:
+  retention_days: 7
+  per_project_cap_mb: 100
+  cleanup_interval_min: 60
+  timezone: UTC
+  filename_pattern: '{YYYY-MM-DD}_{HHMMSS}_{shortuuid}.log'
+
+# UI 100ms 버퍼
+log_buffer:
+  flush_interval_ms: 100

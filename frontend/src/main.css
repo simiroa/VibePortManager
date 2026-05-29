@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-950 text-gray-100 antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  user-select: none;
+}
+
+/* 포트·커맨드·로그 전용 모노스페이스 */
+.mono { font-family: ui-monospace, 'Cascadia Code', 'Consolas', monospace; }
+
+/* Frameless window titlebar controls */
+.tb-btn {
+  @apply w-11 flex items-center justify-center text-xs text-gray-400
+         hover:bg-gray-800 hover:text-gray-100 transition-colors leading-none;
+}
+.tb-close:hover { @apply bg-red-600 text-white; }
+
+.tab-btn {
+  @apply px-4 py-2 text-sm font-medium text-gray-400 border-b-2 border-transparent hover:text-gray-200 hover:border-gray-500 transition-colors;
+}
+
+.tab-btn.active {
+  @apply text-indigo-400 border-indigo-500;
+}
+
+.btn {
+  @apply px-3 py-1 rounded text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+/* 카드 내 소형 버튼 */
+.btn-xs {
+  @apply px-2 py-0.5 rounded text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.btn-green  { @apply btn bg-green-700  hover:bg-green-600  text-white; }
+.btn-red    { @apply btn bg-red-700    hover:bg-red-600    text-white; }
+.btn-yellow { @apply btn bg-yellow-700 hover:bg-yellow-600 text-white; }
+.btn-gray   { @apply btn bg-gray-700   hover:bg-gray-600   text-gray-200; }
+.btn-ghost  { @apply btn bg-gray-700   hover:bg-gray-600   text-gray-200; }
+.btn-disabled { @apply btn bg-gray-800 text-gray-600 cursor-not-allowed opacity-50; }
+
+.badge {
+  @apply inline-block px-2 py-0.5 rounded-full text-xs font-bold;
+}
+
+.badge-running   { @apply badge bg-green-800 text-green-200; }
+.badge-stopped   { @apply badge bg-gray-700 text-gray-300; }
+.badge-starting  { @apply badge bg-yellow-800 text-yellow-200; }
+.badge-stopping  { @apply badge bg-orange-800 text-orange-200; }
+.badge-collision { @apply badge bg-red-800 text-red-200; }
+.badge-error     { @apply badge bg-rose-900 text-rose-200; }
+
+.input {
+  @apply w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500;
+}
+
+.card {
+  @apply bg-gray-900 border border-gray-800 rounded-lg p-4;
+}
+
+/* Log panel */
+#log-output {
+  @apply font-mono text-xs text-green-300 whitespace-pre-wrap;
+}

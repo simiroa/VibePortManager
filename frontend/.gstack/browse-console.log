@@ -1,0 +1,200 @@
+[2026-05-29T11:21:02.160Z] [warning] Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props
+[2026-05-29T11:21:06.856Z] [error] Failed to load resource: the server responded with a status of 403 ()
+[2026-05-29T11:21:07.068Z] [log] --- Custom Swiper Script Loading! ---
+[2026-05-29T11:21:07.689Z] [error] Framing 'https://www.google.com/' violates the following report-only Content Security Policy directive: "frame-ancestors 'self'". The violation has been logged, but no further action has been taken.
+
+[2026-05-29T11:21:11.187Z] [warning] [.WebGL-0x50e400117100]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[2026-05-29T11:21:11.188Z] [warning] [.WebGL-0x50e400117100]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[2026-05-29T11:21:11.227Z] [warning] [.WebGL-0x50e400117100]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[2026-05-29T11:21:11.227Z] [warning] [.WebGL-0x50e400117100]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+[2026-05-29T11:21:19.132Z] [log] %c __                                               _____          __          __           ______          v1.0.0
+/\ \       __                                    /\  __`\       /\ \      __/\ \__       /\__  _\                       
+\ \ \     /\_\    ___      __     __     _ __    \ \ \/\ \  _ __\ \ \____/\_\ \ ,_\      \/_/\ \/     ___     ___       
+ \ \ \  __\/\ \ /' _ `\  /'__`\ /'__`\  /\`'__\   \ \ \ \ \/\`'__\ \ '__`\/\ \ \ \/         \ \ \   /' _ `\  /'___\     
+  \ \ \L\ \\ \ \/\ \/\ \/\  __//\ \L\.\_\ \ \/     \ \ \_\ \ \ \/ \ \ \L\ \ \ \ \ \_  __     \_\ \__/\ \/\ \/\ \__/  __ 
+   \ \____/ \ \_\ \_\ \_\ \____\ \__/.\_\\ \_\      \ \_____\ \_\  \ \_,__/\ \_\ \__\/\ \    /\_____\ \_\ \_\ \____\/\_\
+    \/___/   \/_/\/_/\/_/\/____/\/__/\/_/ \/_/       \/_____/\/_/   \/___/  \/_/\/__/\ \/    \/_____/\/_/\/_/\/____/\/_/
+                                                                                      \/
+
+The product development system for teams and agents
+
+WE'RE HIRING: https://linear.app/careers
+CHANGELOG:    https://linear.app/changelog
+ 
+  font-family: monospace;
+  color: #282A30;
+  
+[2026-05-29T11:21:24.959Z] [warning] The resource https://static.linear.app/web/_next/static/css/7aed057601b146f8.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:21:24.959Z] [warning] The resource https://static.linear.app/web/_next/static/css/1ed6a48544b81434.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:21:24.959Z] [warning] The resource https://static.linear.app/web/_next/static/css/4fb6659a6e117881.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:21:42.777Z] [warning] Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props
+[2026-05-29T11:22:11.337Z] [warning] Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props
+[2026-05-29T11:22:16.396Z] [log] --- Custom Swiper Script Loading! ---
+[2026-05-29T11:22:16.397Z] [error] Failed to load resource: the server responded with a status of 403 ()
+[2026-05-29T11:22:27.067Z] [warning] The resource https://www.raycast.com/_next/static/css/e237fe48640f2df0.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.067Z] [warning] The resource https://www.raycast.com/_next/static/css/f9b7e43756b3bc88.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/eca4b0882116b67c.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/3c5c317d789c2f8f.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/c746e184faa27356.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/e6c32a541543cc1e.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/03115e587dfe45ad.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/2a8f77c67437eb59.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/cffed3af15610fe8.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/9c49dba1779f634c.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/1c02219b2e5bd11c.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.068Z] [warning] The resource https://www.raycast.com/_next/static/css/aac132723bd0ec87.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.069Z] [warning] The resource https://www.raycast.com/_next/static/css/152ba8e82cdeb326.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.069Z] [warning] The resource https://www.raycast.com/_next/static/css/5d98d8ee8a348092.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.069Z] [warning] The resource https://www.raycast.com/_next/static/css/f76ca6df95a524d4.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.069Z] [warning] The resource https://www.raycast.com/_next/static/css/26ef1fa98ca05160.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:27.069Z] [warning] The resource https://www.raycast.com/_next/static/css/b0120ddedd581413.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.168Z] [warning] The resource https://www.raycast.com/_next/static/css/e237fe48640f2df0.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.168Z] [warning] The resource https://www.raycast.com/_next/static/css/f9b7e43756b3bc88.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.168Z] [warning] The resource https://www.raycast.com/_next/static/css/eca4b0882116b67c.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.168Z] [warning] The resource https://www.raycast.com/_next/static/css/3c5c317d789c2f8f.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.168Z] [warning] The resource https://www.raycast.com/_next/static/css/c746e184faa27356.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.168Z] [warning] The resource https://www.raycast.com/_next/static/css/e6c32a541543cc1e.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.168Z] [warning] The resource https://www.raycast.com/_next/static/css/03115e587dfe45ad.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.168Z] [warning] The resource https://www.raycast.com/_next/static/css/2a8f77c67437eb59.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.168Z] [warning] The resource https://www.raycast.com/_next/static/css/cffed3af15610fe8.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.169Z] [warning] The resource https://www.raycast.com/_next/static/css/9c49dba1779f634c.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.169Z] [warning] The resource https://www.raycast.com/_next/static/css/1c02219b2e5bd11c.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.169Z] [warning] The resource https://www.raycast.com/_next/static/css/aac132723bd0ec87.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.169Z] [warning] The resource https://www.raycast.com/_next/static/css/152ba8e82cdeb326.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.169Z] [warning] The resource https://www.raycast.com/_next/static/css/5d98d8ee8a348092.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.169Z] [warning] The resource https://www.raycast.com/_next/static/css/f76ca6df95a524d4.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.169Z] [warning] The resource https://www.raycast.com/_next/static/css/26ef1fa98ca05160.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:42.169Z] [warning] The resource https://www.raycast.com/_next/static/css/b0120ddedd581413.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:45.361Z] [log] %c __                                               _____          __          __           ______          v1.0.0
+/\ \       __                                    /\  __`\       /\ \      __/\ \__       /\__  _\                       
+\ \ \     /\_\    ___      __     __     _ __    \ \ \/\ \  _ __\ \ \____/\_\ \ ,_\      \/_/\ \/     ___     ___       
+ \ \ \  __\/\ \ /' _ `\  /'__`\ /'__`\  /\`'__\   \ \ \ \ \/\`'__\ \ '__`\/\ \ \ \/         \ \ \   /' _ `\  /'___\     
+  \ \ \L\ \\ \ \/\ \/\ \/\  __//\ \L\.\_\ \ \/     \ \ \_\ \ \ \/ \ \ \L\ \ \ \ \ \_  __     \_\ \__/\ \/\ \/\ \__/  __ 
+   \ \____/ \ \_\ \_\ \_\ \____\ \__/.\_\\ \_\      \ \_____\ \_\  \ \_,__/\ \_\ \__\/\ \    /\_____\ \_\ \_\ \____\/\_\
+    \/___/   \/_/\/_/\/_/\/____/\/__/\/_/ \/_/       \/_____/\/_/   \/___/  \/_/\/__/\ \/    \/_____/\/_/\/_/\/____/\/_/
+                                                                                      \/
+
+The product development system for teams and agents
+
+WE'RE HIRING: https://linear.app/careers
+CHANGELOG:    https://linear.app/changelog
+ 
+  font-family: monospace;
+  color: #282A30;
+  
+[2026-05-29T11:22:49.471Z] [warning] The resource https://static.linear.app/web/_next/static/css/7aed057601b146f8.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:49.472Z] [warning] The resource https://static.linear.app/web/_next/static/css/1ed6a48544b81434.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:49.472Z] [warning] The resource https://static.linear.app/web/_next/static/css/4fb6659a6e117881.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:22:50.894Z] [clear] console.clear
+[2026-05-29T11:22:50.894Z] [info] 
+    _____
+ ___ |[]|_n__n_I_c
+|___||__|###|____}
+ O-O--O-O+++--O-O
+****************************************
+*                                      *
+*           Enjoying Railway?          *
+*                                      *
+*         Want to ride with us?        *
+*                                      *
+*              Hop aboard,             *
+*   the train is leaving the station!  *
+*                                      *
+*      https://railway.com/careers     *
+*                                      *
+****************************************
+
+[2026-05-29T11:22:50.894Z] [clear] console.clear
+[2026-05-29T11:22:50.894Z] [info] 
+    _____
+ ___ |[]|_n__n_I_c
+|___||__|###|____}
+ O-O--O-O+++--O-O
+****************************************
+*                                      *
+*           Enjoying Railway?          *
+*                                      *
+*         Want to ride with us?        *
+*                                      *
+*              Hop aboard,             *
+*   the train is leaving the station!  *
+*                                      *
+*      https://railway.com/careers     *
+*                                      *
+****************************************
+
+[2026-05-29T11:24:24.500Z] [warning] Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props
+[2026-05-29T11:24:28.757Z] [log] --- Custom Swiper Script Loading! ---
+[2026-05-29T11:24:28.854Z] [error] Failed to load resource: the server responded with a status of 403 ()
+[2026-05-29T11:24:43.634Z] [warning] The resource https://www.raycast.com/_next/static/css/e237fe48640f2df0.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.634Z] [warning] The resource https://www.raycast.com/_next/static/css/f9b7e43756b3bc88.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.634Z] [warning] The resource https://www.raycast.com/_next/static/css/eca4b0882116b67c.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.634Z] [warning] The resource https://www.raycast.com/_next/static/css/3c5c317d789c2f8f.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.634Z] [warning] The resource https://www.raycast.com/_next/static/css/c746e184faa27356.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.634Z] [warning] The resource https://www.raycast.com/_next/static/css/e6c32a541543cc1e.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.635Z] [warning] The resource https://www.raycast.com/_next/static/css/03115e587dfe45ad.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.635Z] [warning] The resource https://www.raycast.com/_next/static/css/2a8f77c67437eb59.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.635Z] [warning] The resource https://www.raycast.com/_next/static/css/9c49dba1779f634c.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.635Z] [warning] The resource https://www.raycast.com/_next/static/css/cffed3af15610fe8.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.635Z] [warning] The resource https://www.raycast.com/_next/static/css/1c02219b2e5bd11c.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.636Z] [warning] The resource https://www.raycast.com/_next/static/css/aac132723bd0ec87.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.636Z] [warning] The resource https://www.raycast.com/_next/static/css/152ba8e82cdeb326.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.636Z] [warning] The resource https://www.raycast.com/_next/static/css/5d98d8ee8a348092.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.636Z] [warning] The resource https://www.raycast.com/_next/static/css/f76ca6df95a524d4.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.636Z] [warning] The resource https://www.raycast.com/_next/static/css/26ef1fa98ca05160.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:43.636Z] [warning] The resource https://www.raycast.com/_next/static/css/b0120ddedd581413.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+[2026-05-29T11:24:50.558Z] [log] %c __                                               _____          __          __           ______          v1.0.0
+/\ \       __                                    /\  __`\       /\ \      __/\ \__       /\__  _\                       
+\ \ \     /\_\    ___      __     __     _ __    \ \ \/\ \  _ __\ \ \____/\_\ \ ,_\      \/_/\ \/     ___     ___       
+ \ \ \  __\/\ \ /' _ `\  /'__`\ /'__`\  /\`'__\   \ \ \ \ \/\`'__\ \ '__`\/\ \ \ \/         \ \ \   /' _ `\  /'___\     
+  \ \ \L\ \\ \ \/\ \/\ \/\  __//\ \L\.\_\ \ \/     \ \ \_\ \ \ \/ \ \ \L\ \ \ \ \ \_  __     \_\ \__/\ \/\ \/\ \__/  __ 
+   \ \____/ \ \_\ \_\ \_\ \____\ \__/.\_\\ \_\      \ \_____\ \_\  \ \_,__/\ \_\ \__\/\ \    /\_____\ \_\ \_\ \____\/\_\
+    \/___/   \/_/\/_/\/_/\/____/\/__/\/_/ \/_/       \/_____/\/_/   \/___/  \/_/\/__/\ \/    \/_____/\/_/\/_/\/____/\/_/
+                                                                                      \/
+
+The product development system for teams and agents
+
+WE'RE HIRING: https://linear.app/careers
+CHANGELOG:    https://linear.app/changelog
+ 
+  font-family: monospace;
+  color: #282A30;
+  
+[2026-05-29T11:24:54.724Z] [clear] console.clear
+[2026-05-29T11:24:54.725Z] [info] 
+    _____
+ ___ |[]|_n__n_I_c
+|___||__|###|____}
+ O-O--O-O+++--O-O
+****************************************
+*                                      *
+*           Enjoying Railway?          *
+*                                      *
+*         Want to ride with us?        *
+*                                      *
+*              Hop aboard,             *
+*   the train is leaving the station!  *
+*                                      *
+*      https://railway.com/careers     *
+*                                      *
+****************************************
+
+[2026-05-29T11:24:54.725Z] [clear] console.clear
+[2026-05-29T11:24:54.725Z] [info] 
+    _____
+ ___ |[]|_n__n_I_c
+|___||__|###|____}
+ O-O--O-O+++--O-O
+****************************************
+*                                      *
+*           Enjoying Railway?          *
+*                                      *
+*         Want to ride with us?        *
+*                                      *
+*              Hop aboard,             *
+*   the train is leaving the station!  *
+*                                      *
+*      https://railway.com/careers     *
+*                                      *
+****************************************
+

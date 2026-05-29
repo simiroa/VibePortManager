@@ -1,0 +1,3 @@
+[2026-05-28T08:26:48.315Z] GET file:///C:/Users/HG/Documents/Phase_yg/.lazyweb/design-improve/vpm-dashboard-2026-05-28/after-mockup.html → 200 (3ms, 13619B)
+[2026-05-28T08:26:48.322Z] GET https://cdn.tailwindcss.com/ → pending (?ms, ?B)
+[2026-05-28T08:26:48.753Z] GET https://cdn.tailwindcss.com/3.4.17 → 200 (314ms, 407279B)
