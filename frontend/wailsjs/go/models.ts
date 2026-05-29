@@ -96,6 +96,7 @@ export namespace project {
 	    name: string;
 	    command: string;
 	    port: number;
+	    source: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DetectedServer(source);
@@ -106,6 +107,7 @@ export namespace project {
 	        this.name = source["name"];
 	        this.command = source["command"];
 	        this.port = source["port"];
+	        this.source = source["source"];
 	    }
 	}
 	export class ProjectAnalysis {

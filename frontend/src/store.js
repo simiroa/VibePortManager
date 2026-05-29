@@ -41,3 +41,11 @@ export function findProjectByServer(serverID) {
   }
   return null
 }
+
+export function findProjectByPort(port) {
+  for (const p of _projects) {
+    const srv = (p.servers ?? []).find(s => s.port === port)
+    if (srv) return { project: p, server: srv }
+  }
+  return null
+}

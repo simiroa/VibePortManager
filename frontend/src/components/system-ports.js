@@ -1,12 +1,13 @@
-// components/system-ports.js — System Port Analyzer + Port Killer panel
-// Lists every listening port across Windows + WSL backends with a Kill action.
-// Opened from the sidebar; rendered inside the shared modal overlay.
-// Kill uses an inline two-step confirm (no nested modal — the overlay is shared).
+// components/system-ports.js — System Port Analyzer + Port Killer + Registration
+// Lists every listening port, with caching to avoid repeated scans.
+// Unregistered ports can be added to existing projects or create new ones.
 
-import { ScanSystemPorts, KillByPort } from '../wails.js'
-import { showModal } from '../modal.js'
-import { getProjects, findProjectByServer } from '../store.js'
+import { ScanSystemPorts, KillByPort, AddProject, AddServer, ListProjects } from '../wails.js'
+import { showModal, showError } from '../modal.js'
+import { getProjects, findProjectByPort } from '../store.js'
 import { setProjectFilter } from '../state.js'
+
+let _cachedEntries = null
 
 export async function openSystemPorts() {
   const promise = showModal({
@@ -15,25 +16,32 @@ export async function openSystemPorts() {
     formContent: `<div id="sp-body" class="mt-2"><p class="text-xs text-gray-500">Scanning…</p></div>`,
     actions: [{ label: 'Close', value: 'close', style: 'btn-ghost' }],
   })
-  // The modal DOM is rendered synchronously by showModal above; populate it now.
   refresh()
   await promise
 }
 
 async function refresh() {
   const body = document.getElementById('sp-body')
-  if (!body) return // modal was closed
-  body.innerHTML = `<p class="text-xs text-gray-500">Scanning…</p>`
+  if (!body) return
 
-  let entries = []
+  if (_cachedEntries !== null) {
+    renderEntries(_cachedEntries, body)
+    return
+  }
+
+  body.innerHTML = `<p class="text-xs text-gray-500">Scanning…</p>`
   try {
-    entries = (await ScanSystemPorts()) ?? []
+    _cachedEntries = (await ScanSystemPorts()) ?? []
   } catch (e) {
     body.innerHTML = `<p class="text-xs text-red-400">Scan failed: ${esc(e?.message)}</p>`
     return
   }
-  entries.sort((a, b) => a.port - b.port)
 
+  renderEntries(_cachedEntries, body)
+}
+
+function renderEntries(entries, body) {
+  entries.sort((a, b) => a.port - b.port)
   const managed = new Set()
   for (const p of getProjects()) for (const s of (p.servers ?? [])) managed.add(s.port)
 
@@ -48,7 +56,10 @@ async function refresh() {
         : entries.map(rowHTML(managed)).join('')}
     </div>
   `
-  document.getElementById('sp-rescan')?.addEventListener('click', refresh)
+  document.getElementById('sp-rescan')?.addEventListener('click', () => {
+    _cachedEntries = null
+    refresh()
+  })
   body.querySelectorAll('[data-port-info]').forEach(row =>
     row.addEventListener('click', e => {
       if (e.target.closest('[data-kill-port], [data-confirm-kill], [data-cancel-kill]')) return
@@ -78,13 +89,9 @@ function onPortRowClick(info) {
   const { port, processName, pid, backendId } = info
   if (!port) return
 
-  // Find if any VPM server is on this port
-  const managedServer = Array.from(getProjects())
-    .flatMap(p => (p.servers ?? []).map(s => ({ ...s, projectId: p.id })))
-    .find(s => s.port === port)
-
+  const managedServer = findProjectByPort(port)
   const managerLabel = managedServer
-    ? `${managedServer.name} (${getProjects().find(p => p.id === managedServer.projectId)?.name})`
+    ? `${managedServer.server.name} (${managedServer.project.name})`
     : 'Not managed by VPM'
 
   const content = `
@@ -114,6 +121,8 @@ function onPortRowClick(info) {
         { label: 'Close', value: 'close', style: 'btn-ghost' },
       ]
     : [
+        { label: 'Add to Project…', value: 'add', style: 'btn-primary' },
+        { label: 'New Project…', value: 'new', style: 'btn-ghost' },
         { label: 'Close', value: 'close', style: 'btn-ghost' },
       ]
 
@@ -122,13 +131,113 @@ function onPortRowClick(info) {
     message: '',
     formContent: content,
     actions,
-  }).then(result => {
+  }).then(async result => {
     if (result === 'goto' && managedServer) {
-      setProjectFilter(managedServer.projectId)
-      // Close the System Ports modal by simulating close button click
+      setProjectFilter(managedServer.project.id)
       document.querySelector('[data-nav="system-ports"]')?.click()
+    } else if (result === 'add') {
+      await addToExistingProject(port, processName)
+    } else if (result === 'new') {
+      await createNewProject(port, processName)
     }
   })
+}
+
+async function addToExistingProject(port, processName) {
+  const projects = getProjects()
+  const projectOptions = projects.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')
+
+  const result = await showModal({
+    title: 'Add to Project',
+    message: '',
+    formContent: `
+      <div class="space-y-2 mt-2">
+        <select id="sp-project-select" class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
+          ${projectOptions}
+        </select>
+        <input id="sp-server-name" type="text" placeholder="Server name (e.g. dev)" value="${esc(processName || 'server')}"
+          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
+        <input id="sp-server-cmd" type="text" placeholder="Command (e.g. npm run dev)"
+          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 mono text-sm text-gray-100">
+      </div>
+    `,
+    actions: [
+      { label: 'Cancel', value: 'cancel', style: 'btn-ghost' },
+      { label: 'Register', value: 'register', style: 'btn-primary' },
+    ],
+  })
+
+  if (result !== 'register') return
+
+  const projectId = document.getElementById('sp-project-select')?.value
+  const name = document.getElementById('sp-server-name')?.value?.trim()
+  const command = document.getElementById('sp-server-cmd')?.value?.trim()
+
+  if (!projectId || !name || !command) {
+    await showError('Incomplete', 'Project, name, and command are required.')
+    return
+  }
+
+  try {
+    await AddServer(projectId, { id: '', name, command, port, autostart: false, autorestart: false })
+    await refreshProjects()
+    await showModal({ title: 'Registered', message: `Server ":${port}" added to project.` })
+  } catch (e) {
+    await showError('Registration failed', e?.message)
+  }
+}
+
+async function createNewProject(port, processName) {
+  const result = await showModal({
+    title: 'New Project',
+    message: 'Register this port as a new project.',
+    formContent: `
+      <div class="space-y-2 mt-2">
+        <input id="sp-proj-path" type="text" placeholder="Project path (e.g. C:\\projects\\myapp)"
+          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
+        <input id="sp-proj-name" type="text" placeholder="Project name"
+          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
+        <input id="sp-server-name2" type="text" placeholder="Server name" value="${esc(processName || 'server')}"
+          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
+        <input id="sp-server-cmd2" type="text" placeholder="Command (e.g. npm run dev)"
+          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 mono text-sm text-gray-100">
+      </div>
+    `,
+    actions: [
+      { label: 'Cancel', value: 'cancel', style: 'btn-ghost' },
+      { label: 'Create', value: 'create', style: 'btn-primary' },
+    ],
+  })
+
+  if (result !== 'create') return
+
+  const path = document.getElementById('sp-proj-path')?.value?.trim()
+  const projName = document.getElementById('sp-proj-name')?.value?.trim()
+  const srvName = document.getElementById('sp-server-name2')?.value?.trim()
+  const srvCmd = document.getElementById('sp-server-cmd2')?.value?.trim()
+
+  if (!path || !projName || !srvName || !srvCmd) {
+    await showError('Incomplete', 'All fields are required.')
+    return
+  }
+
+  try {
+    const proj = await AddProject(path, projName, null)
+    await AddServer(proj.id, { id: '', name: srvName, command: srvCmd, port, autostart: false, autorestart: false })
+    await refreshProjects()
+    setProjectFilter(proj.id)
+    await showModal({ title: 'Created', message: `Project "${projName}" created with server on port :${port}.` })
+  } catch (e) {
+    await showError('Creation failed', e?.message)
+  }
+}
+
+async function refreshProjects() {
+  try {
+    const projects = await ListProjects()
+    const { setProjects } = await import('../store.js')
+    setProjects(projects ?? [])
+  } catch (_) {}
 }
 
 function onKillClick(btn) {
@@ -140,7 +249,6 @@ function onKillClick(btn) {
     <button data-confirm-kill class="text-red-300 bg-red-900/40 hover:bg-red-900/60 px-1.5 py-0.5 rounded transition-colors">Confirm</button>
     <button data-cancel-kill class="text-gray-400 hover:text-gray-200 px-1.5 py-0.5 transition-colors">✕</button>
   `
-  // Cancel → rescan resets the row to its default state.
   slot.querySelector('[data-cancel-kill]')?.addEventListener('click', refresh)
   slot.querySelector('[data-confirm-kill]')?.addEventListener('click', async () => {
     slot.innerHTML = `<span class="text-gray-500">killing…</span>`
@@ -150,6 +258,7 @@ function onKillClick(btn) {
       slot.innerHTML = `<span class="text-red-400" title="${esc(e?.message)}">failed</span>`
       return
     }
+    _cachedEntries = null
     await refresh()
   })
 }
@@ -157,7 +266,7 @@ function onKillClick(btn) {
 function shortBackend(id) {
   if (!id) return ''
   if (id === 'windows-native') return 'win'
-  return id.replace(/^wsl:?/i, 'wsl:') // "wsl:Ubuntu"
+  return id.replace(/^wsl:?/i, 'wsl:')
 }
 
 function esc(str) {

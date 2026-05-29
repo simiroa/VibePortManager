@@ -31,9 +31,24 @@ Thumbs.db
 *.a
 .tox/
 coverage.out
+cov.out
+coverage
 
 # Lazyweb design reports
 .lazyweb/
 
 # Dependencies
 vendor/
+
+# Claude Code local settings (personal, machine-specific)
+.claude/settings.local.json
+
+# TSMA tool session state
+.tsma/
+
+# gstack browser session logs
+.gstack/
+frontend/.gstack/
+
+# Temporary design/screenshot references
+clipboard_image_01.png

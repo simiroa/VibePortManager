@@ -304,6 +304,28 @@ async function handleAction(e) {
       document.querySelector('[data-nav="add-project"]')?.click()
       break
 
+    case 'toggle-autostart':
+      if (serverID) {
+        const info = findProjectByServer(serverID)
+        if (info) {
+          const toggled = !info.server.autostart
+          await UpdateServer(info.project.id, { ...info.server, autostart: toggled })
+          await refreshProjects()
+        }
+      }
+      break
+
+    case 'toggle-autorestart':
+      if (serverID) {
+        const info = findProjectByServer(serverID)
+        if (info) {
+          const toggled = !info.server.autorestart
+          await UpdateServer(info.project.id, { ...info.server, autorestart: toggled })
+          await refreshProjects()
+        }
+      }
+      break
+
     case 'copy-path': {
       const path = btn.dataset.path
       if (path) {
@@ -372,14 +394,30 @@ async function handleAction(e) {
 // ── ⋮ Card menu ───────────────────────────────────────────────────────────────
 
 function _openCardMenu(triggerBtn, serverID, projectID) {
-  // Close any existing menu first
   document.querySelector('.card-menu-dropdown')?.remove()
 
+  const info = findProjectByServer(serverID)
+  const srv = info?.server
+  if (!srv) return
+
+  const autostart = srv.autostart ?? false
+  const autorestart = srv.autorestart ?? false
+
+  const rect = triggerBtn.getBoundingClientRect()
   const menu = document.createElement('div')
-  menu.className =
-    'card-menu-dropdown absolute z-50 right-0 top-6 bg-gray-800 border border-gray-700 ' +
-    'rounded-lg shadow-xl py-1 min-w-[120px]'
+  menu.className = 'card-menu-dropdown fixed z-50 bg-gray-800 border border-gray-700 rounded-lg shadow-xl py-1 min-w-[160px]'
+  menu.style.top = `${rect.bottom + 4}px`
+  menu.style.left = `${rect.right - 160}px`
   menu.innerHTML = `
+    <button data-action="toggle-autostart" data-server-id="${serverID}"
+      class="w-full text-left px-3 py-2 text-xs text-gray-200 hover:bg-gray-700 transition-colors flex items-center gap-2">
+      <span class="${autostart ? 'text-green-400' : 'text-gray-600'}">●</span> Autostart
+    </button>
+    <button data-action="toggle-autorestart" data-server-id="${serverID}"
+      class="w-full text-left px-3 py-2 text-xs text-gray-200 hover:bg-gray-700 transition-colors flex items-center gap-2">
+      <span class="${autorestart ? 'text-green-400' : 'text-gray-600'}">●</span> Auto-restart
+    </button>
+    <div class="border-t border-gray-700 my-1"></div>
     <button data-action="resync-port"
       data-server-id="${serverID}" data-project-id="${projectID}"
       class="w-full text-left px-3 py-2 text-xs text-gray-200 hover:bg-gray-700 transition-colors">
@@ -397,11 +435,7 @@ function _openCardMenu(triggerBtn, serverID, projectID) {
     </button>
   `
 
-  // Append inside the `.relative` wrapper that contains the ⋮ button
-  const wrap = triggerBtn.closest('.relative')
-  if (wrap) wrap.appendChild(menu)
-
-  // Click outside → close
+  document.body.appendChild(menu)
   const close = ev => {
     if (!menu.contains(ev.target) && ev.target !== triggerBtn) {
       menu.remove()
@@ -451,6 +485,12 @@ async function addServerFlow(projectID) {
           </button>
         </div>
         <div id="asrv-hint" class="text-xs text-gray-600 hidden"></div>
+        <div id="asrv-live-ports" class="mt-1">
+          <p class="text-xs text-gray-500 mb-1">Live ports (click to fill):</p>
+          <div id="asrv-port-chips" class="flex flex-wrap gap-1">
+            <span class="text-[10px] text-gray-600">Scanning…</span>
+          </div>
+        </div>
         <label class="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
           <input type="checkbox" id="asrv-auto" class="accent-indigo-500">
           Start on VPM launch
@@ -466,6 +506,42 @@ async function addServerFlow(projectID) {
       { label: 'Add Server', value: 'add',    style: 'btn-primary' },
     ],
   })
+
+  // Wire live ports chips (async, don't block modal open)
+  ;(async () => {
+    const chipsEl = document.getElementById('asrv-port-chips')
+    if (!chipsEl) return
+    try {
+      const livePorts = await Promise.race([
+        GetListeningPorts(),
+        new Promise(r => setTimeout(() => r([]), 3000)),
+      ])
+      const proj     = getProjects().find(p => p.id === projectID)
+      const regPorts = new Set((proj?.servers ?? []).map(s => s.port))
+      const unregistered = livePorts.filter(p => !regPorts.has(p) && p >= 1024 && p <= 49151).slice(0, 10)
+
+      if (unregistered.length === 0) {
+        chipsEl.innerHTML = '<span class="text-[10px] text-gray-600">None active</span>'
+      } else {
+        chipsEl.innerHTML = unregistered.map(port => `
+          <button type="button" data-port="${port}"
+            class="text-[10px] px-2 py-0.5 rounded bg-indigo-900/40 text-indigo-300 hover:bg-indigo-700 transition-colors mono">
+            :${port}
+          </button>
+        `).join('')
+        chipsEl.querySelectorAll('[data-port]').forEach(chip => {
+          chip.addEventListener('click', e => {
+            e.preventDefault()
+            const port = chip.dataset.port
+            const portInput = document.getElementById('asrv-port')
+            if (portInput) portInput.value = port
+          })
+        })
+      }
+    } catch (_) {
+      chipsEl.innerHTML = '<span class="text-[10px] text-gray-600">Scan failed</span>'
+    }
+  })()
 
   // Wire Detect button (modal DOM is synchronously rendered above)
   document.getElementById('asrv-detect')?.addEventListener('click', async () => {
