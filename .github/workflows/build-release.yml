@@ -38,7 +38,7 @@ jobs:
       - name: Build Windows executable
         run: |
           $env:PATH = "$env:GOPATH\bin;$env:PATH"
-          wails build -platform windows -output vibe-port-manager.exe
+          wails build -platform windows/amd64
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
