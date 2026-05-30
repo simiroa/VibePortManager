@@ -106,6 +106,20 @@ func (w *wslBackend) ResolvePortOwner(port int) (PortOwner, error) {
 // Windows-native only for now); returns 0 so callers treat it as "not found".
 func (w *wslBackend) ResolveTreePort(_ int) (int, error) { return 0, nil }
 
+// ResolveProcessCommand reads /proc/<pid>/cmdline inside the distro (NUL-separated
+// args). Returns "" when unavailable — callers fall back to monitor-only.
+func (w *wslBackend) ResolveProcessCommand(pid int) (string, error) {
+	if pid <= 0 {
+		return "", nil
+	}
+	out, err := w.wslExec("cat", fmt.Sprintf("/proc/%d/cmdline", pid))
+	if err != nil {
+		return "", nil
+	}
+	cmd := strings.TrimSpace(strings.ReplaceAll(out, "\x00", " "))
+	return cmd, nil
+}
+
 func (w *wslBackend) ScanListenPorts() ([]ListenEntry, error) {
 	out, err := w.wslExec("ss", "-ltnp")
 	if err != nil {

@@ -31,3 +31,6 @@ func (w *winStub) ScanListenPorts() ([]ListenEntry, error) {
 func (w *winStub) ResolveTreePort(_ int) (int, error) {
 	return 0, fmt.Errorf("windows-native: unsupported")
 }
+func (w *winStub) ResolveProcessCommand(_ int) (string, error) {
+	return "", fmt.Errorf("windows-native: unsupported")
+}

@@ -30,6 +30,10 @@ export function GetListeningPorts() {
   return window['go']['main']['App']['GetListeningPorts']();
 }
 
+export function GetProcessCommand(arg1, arg2) {
+  return window['go']['main']['App']['GetProcessCommand'](arg1, arg2);
+}
+
 export function GetRecentLogs(arg1, arg2) {
   return window['go']['main']['App']['GetRecentLogs'](arg1, arg2);
 }

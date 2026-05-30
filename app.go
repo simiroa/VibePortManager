@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	goruntime "runtime"
+	"strings"
 	"time"
 
 	"github.com/user/vpm/internal/config"
@@ -74,10 +75,10 @@ func (a *App) startup(ctx context.Context) {
 		}
 	}()
 
-	// Autostart servers.
+	// Autostart servers (skip monitor-only servers — they have no start command).
 	for _, proj := range a.cfg.Projects {
 		for _, srv := range proj.Servers {
-			if srv.Autostart {
+			if srv.Autostart && strings.TrimSpace(srv.Command) != "" {
 				a.startServer(proj, srv)
 			}
 		}
@@ -319,6 +320,26 @@ func (a *App) KillByPort(port int) error {
 		return b.KillPID(owner.PID)
 	}
 	return fmt.Errorf("no process found on port %d", port)
+}
+
+// GetProcessCommand returns the full command line of the process listening on a
+// scanned port, used to auto-fill the start command when registering it. The
+// backendID selects the right namespace (Windows vs WSL PIDs differ); an empty
+// backendID falls back to the windows-native backend. Returns "" when unknown.
+func (a *App) GetProcessCommand(pid int, backendID string) (string, error) {
+	if pid <= 0 {
+		return "", nil
+	}
+	for _, b := range a.mgr.AllBackends() {
+		if backendID == "" || b.ID() == backendID {
+			cmd, err := b.ResolveProcessCommand(pid)
+			if err != nil {
+				return "", nil // unknown — caller falls back to monitor-only
+			}
+			return cmd, nil
+		}
+	}
+	return "", nil
 }
 
 // SuggestFreePort returns a free port near startFrom.

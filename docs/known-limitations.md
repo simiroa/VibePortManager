@@ -1,6 +1,6 @@
 # VPM Known Limitations & Gap Analysis
 
-**Date:** 2026-05-28  
+**Date:** 2026-05-30  
 **Reference spec:** `plan.md` (cross-platform functional spec)  
 **Actual scope:** Windows 10/11 amd64 MVP
 
@@ -124,10 +124,17 @@ can have multiple log files; they are copied into the selected folder rather tha
 - Log strip integrated in server-list view (collapsible, auto-scroll)
 - Export logs via native folder picker (`BrowseDirectory`)
 - **Folder picker** (⊞ button in Add Project modal): native `OpenDirectoryDialog`.
-- **System Port Analyzer + Port Killer**: the **System Ports** sidebar entry opens a panel
-  (`components/system-ports.js`) that lists every listening port across Windows + WSL backends
-  (`ScanSystemPorts` → port / PID / process / backend), tags VPM-managed ports, and offers a
-  two-step inline **Kill** (`KillByPort`) plus **Rescan**.
+- **System Port Analyzer + Port Killer + Registration**: the **System Ports** sidebar entry opens a
+  panel (`components/system-ports.js`) that lists every listening port across Windows + WSL backends
+  (`ScanSystemPorts` → port / PID / process / backend), tags VPM-managed ports, and offers a two-step
+  inline **Kill** (`KillByPort`) plus **Rescan**. Clicking a row opens an **inline detail** (the scan
+  list stays open — single-modal router: list → detail → add/new) where an unmanaged port can be
+  **registered to an existing project or as a new project**. The start command is **auto-detected**
+  from the listening process (`GetProcessCommand` → `Backend.ResolveProcessCommand`); leaving it blank
+  registers a **monitor-only** server (VPM tracks the port but doesn't own the process — Start/Restart
+  hidden, Stop still kills by port).
+- **Light/Dark theme** (beyond plan.md): `theme.js` + titlebar toggle. Defaults to OS preference,
+  manual override persisted in `localStorage`; CSS via `html:not(.dark)` overrides in `main.css`.
 
 **Not implemented** ❌  
 - **Drag-and-drop directory area**: a native folder picker is wired, but HTML5 drag-and-drop
@@ -170,6 +177,10 @@ the Go/Wails host process only.
 | Native folder picker for export | ✅ done | `BrowseDirectory` → `OpenDirectoryDialog` |
 | Collision one-click resolve | ✅ done | Inline "Use free port" in alert strip; persists + relaunches |
 | System Port Analyzer + killer | ✅ done | `components/system-ports.js` + `ScanSystemPorts`/`KillByPort` |
+| Port backtrack → register | ✅ done | System Ports detail → add to project / new project (inline router, scan stays open) |
+| Command auto-detect from port | ✅ done | `GetProcessCommand` → `Backend.ResolveProcessCommand` (win: CIM, wsl: /proc) |
+| Monitor-only tracking (blank cmd) | ✅ done | empty command = track port only; `start.go` guard, UI hides Start/Restart |
+| Light/Dark theme | ✅ done (beyond plan.md) | `theme.js` + titlebar toggle, OS-preference default, localStorage persist |
 | System tray (restore/quit) | ✅ done | `getlantern/systray`, `internal/tray/systray.go` |
 | Multi-server detect (PM2 import) | ✅ done | `internal/project/ecosystem.go` → `ProjectAnalysis.Servers` + multi-select import |
 | Multi-server detect (general) | ✅ done | Detector framework (`detect.go`): workspaces(monorepo) + docker-compose + PM2 + single; per-type file |

@@ -36,6 +36,7 @@ body {
   @apply px-2 py-0.5 rounded text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
 }
 
+.btn-primary { @apply btn bg-indigo-600 hover:bg-indigo-500 text-white; }
 .btn-green  { @apply btn bg-green-700  hover:bg-green-600  text-white; }
 .btn-red    { @apply btn bg-red-700    hover:bg-red-600    text-white; }
 .btn-yellow { @apply btn bg-yellow-700 hover:bg-yellow-600 text-white; }

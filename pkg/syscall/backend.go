@@ -20,6 +20,10 @@ type Backend interface {
 	// at rootPID (the process or any descendant), or 0 if none. Used to re-detect
 	// a VPM-spawned server whose actual port drifted from the configured one.
 	ResolveTreePort(rootPID int) (int, error)
+	// ResolveProcessCommand returns the full command line of the process with the
+	// given PID, or "" if it cannot be determined. Used to auto-fill the start
+	// command when registering a port discovered via the System Ports scanner.
+	ResolveProcessCommand(pid int) (string, error)
 }
 
 // NewBackend constructs the appropriate Backend for the given execution target.

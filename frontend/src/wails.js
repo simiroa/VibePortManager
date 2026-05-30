@@ -20,6 +20,7 @@ export const ResyncServerPort = id => App().ResyncServerPort(id)
 export const ScanSystemPorts = () => App().ScanSystemPorts()
 export const KillByPort = port => App().KillByPort(port)
 export const SuggestFreePort = from => App().SuggestFreePort(from)
+export const GetProcessCommand = (pid, backendID) => App().GetProcessCommand(pid, backendID ?? '')
 
 export const GetRecentLogs = (sid, n) => App().GetRecentLogs(sid, n)
 export const GetSystemStats = () => App().GetSystemStats()

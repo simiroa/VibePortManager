@@ -31,3 +31,6 @@ func (l *linuxStub) ScanListenPorts() ([]ListenEntry, error) {
 func (l *linuxStub) ResolveTreePort(_ int) (int, error) {
 	return 0, fmt.Errorf("linux-native: unsupported")
 }
+func (l *linuxStub) ResolveProcessCommand(_ int) (string, error) {
+	return "", fmt.Errorf("linux-native: unsupported")
+}

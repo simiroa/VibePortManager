@@ -75,6 +75,9 @@ methods:
   - name: SuggestFreePort
     in: [{ name: startFrom, type: int }]
     out: int
+  - name: GetProcessCommand
+    in: [{ name: pid, type: int }, { name: backendID, type: string }]
+    out: 'string | error'  # resolve a listening process's command line for auto-fill
 
   # Log
   - name: GetRecentLogs

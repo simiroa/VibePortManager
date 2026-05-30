@@ -25,17 +25,20 @@
 - **Port reclamation** — resolve orphaned processes (e.g. npm→cmd→node trees) and retry
 - **Free port suggestion** — one-click reassign when collision detected
 - **Port re-detection** — Re-detect button to track servers that drifted from configured port
+- **System Ports backtracking** — scan all listening ports, identify which are unmanaged, register to a project (with auto-detected command) or track monitor-only (VPM tracks the port but doesn't own the process)
 
 ### 👁️ UI/UX
 - **Dense server list** — scannable rows (status · port · name · command · uptime) with hover actions
 - **Mini mode** — always-on-top floating bar showing active port status; click a chip to expand
-- **Frameless dark UI** — custom titlebar, unified gray-950/900/800 theme with indigo accents
+- **Dark/Light theme** — system preference auto-detect, manual toggle in titlebar, persisted across sessions
+- **Frameless window** — custom titlebar with window controls (minimize/maximize/close)
 - **Integrated log strip** — collapsible at bottom, searchable, export to file
-- **System Ports panel** — scan all listening ports, bulk kill by port number
+- **System Ports panel** — scan all listening ports, bulk kill by port number, register unmanaged ports to projects with auto-detected commands
 
 ### 🔧 Advanced
-- **Crash auto-restart** — optionally auto-restart servers on unexpected exit (with crash-loop detection)
-- **Headless daemon mode** — `vpm --daemon` for CI/CD or boot persistence via registry
+- **Monitor-only servers** — register a port without a start command (e.g., for external services like Ollama or Redis) — VPM tracks the port but doesn't own the process
+- **Crash auto-restart** — optionally auto-restart servers on unexpected exit (with crash-loop detection: max 5 restarts per 60s window)
+- **Headless daemon mode** — `vpm --daemon` for CI/CD or boot persistence via Windows Run registry key
 - **Per-user storage** — config in `%APPDATA%\vpm\config.json`, logs in `%APPDATA%\vpm\logs\`
 - **Atomic config saves** — temp→rename pattern, no corruption on power loss
 - **Log rotation** — 7-day retention, 100MB cap per project, rotate on startup + hourly

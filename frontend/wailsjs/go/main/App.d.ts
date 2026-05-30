@@ -18,6 +18,8 @@ export function GetAllServerStates():Promise<Record<string, string>>;
 
 export function GetListeningPorts():Promise<Array<number>>;
 
+export function GetProcessCommand(arg1:number,arg2:string):Promise<string>;
+
 export function GetRecentLogs(arg1:string,arg2:number):Promise<Array<string>>;
 
 export function GetSystemStats():Promise<Record<string, any>>;

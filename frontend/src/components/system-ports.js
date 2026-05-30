@@ -1,9 +1,11 @@
 // components/system-ports.js — System Port Analyzer + Port Killer + Registration
-// Lists every listening port, with caching to avoid repeated scans.
-// Unregistered ports can be added to existing projects or create new ones.
+// Single-modal inline router: list → detail → add / new, all rendered inside
+// #sp-body so the scan window never closes when an item is clicked.
+// Unregistered ports can be added to existing projects or create new ones, with
+// the start command auto-detected from the listening process (blank = monitor-only).
 
-import { ScanSystemPorts, KillByPort, AddProject, AddServer, ListProjects } from '../wails.js'
-import { showModal, showError } from '../modal.js'
+import { ScanSystemPorts, KillByPort, AddProject, AddServer, ListProjects, GetProcessCommand } from '../wails.js'
+import { showModal } from '../modal.js'
 import { getProjects, findProjectByPort } from '../store.js'
 import { setProjectFilter } from '../state.js'
 
@@ -20,35 +22,40 @@ export async function openSystemPorts() {
   await promise
 }
 
+function body() {
+  return document.getElementById('sp-body')
+}
+
+// ── List view ───────────────────────────────────────────────────────────────
+
 async function refresh() {
-  const body = document.getElementById('sp-body')
-  if (!body) return
+  const el = body()
+  if (!el) return
 
   if (_cachedEntries !== null) {
-    renderEntries(_cachedEntries, body)
+    renderEntries(_cachedEntries, el)
     return
   }
 
-  body.innerHTML = `<p class="text-xs text-gray-500">Scanning…</p>`
+  el.innerHTML = `<p class="text-xs text-gray-500">Scanning…</p>`
   try {
     _cachedEntries = (await ScanSystemPorts()) ?? []
   } catch (e) {
-    body.innerHTML = `<p class="text-xs text-red-400">Scan failed: ${esc(e?.message)}</p>`
+    el.innerHTML = `<p class="text-xs text-red-400">Scan failed: ${esc(e?.message)}</p>`
     return
   }
-
-  renderEntries(_cachedEntries, body)
+  renderEntries(_cachedEntries, el)
 }
 
-function renderEntries(entries, body) {
+function renderEntries(entries, el) {
   entries.sort((a, b) => a.port - b.port)
   const managed = new Set()
   for (const p of getProjects()) for (const s of (p.servers ?? [])) managed.add(s.port)
 
-  body.innerHTML = `
+  el.innerHTML = `
     <div class="flex items-center justify-between mb-2">
       <span class="text-xs text-gray-500">${entries.length} listening port${entries.length !== 1 ? 's' : ''}</span>
-      <button id="sp-rescan" class="text-xs px-2 py-1 rounded bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors">Rescan</button>
+      <button id="sp-rescan" class="btn-xs btn-gray">Rescan</button>
     </div>
     <div class="max-h-80 overflow-y-auto border border-gray-800 rounded divide-y divide-gray-800">
       ${entries.length === 0
@@ -60,12 +67,12 @@ function renderEntries(entries, body) {
     _cachedEntries = null
     refresh()
   })
-  body.querySelectorAll('[data-port-info]').forEach(row =>
+  el.querySelectorAll('[data-port-info]').forEach(row =>
     row.addEventListener('click', e => {
       if (e.target.closest('[data-kill-port], [data-confirm-kill], [data-cancel-kill]')) return
-      onPortRowClick(JSON.parse(row.dataset.portInfo))
+      showDetail(JSON.parse(row.dataset.portInfo))
     }))
-  body.querySelectorAll('[data-kill-port]').forEach(btn =>
+  el.querySelectorAll('[data-kill-port]').forEach(btn =>
     btn.addEventListener('click', () => onKillClick(btn)))
 }
 
@@ -85,160 +92,210 @@ const rowHTML = managed => e => `
   </div>
 `
 
-function onPortRowClick(info) {
+// ── Detail view (inline — keeps the scan window open) ─────────────────────────
+
+function showDetail(info) {
+  const el = body()
+  if (!el) return
   const { port, processName, pid, backendId } = info
-  if (!port) return
 
-  const managedServer = findProjectByPort(port)
-  const managerLabel = managedServer
-    ? `${managedServer.server.name} (${managedServer.project.name})`
-    : 'Not managed by VPM'
+  const managed = findProjectByPort(port)
+  const managerLabel = managed
+    ? `${esc(managed.server.name)} <span class="text-gray-500">(${esc(managed.project.name)})</span>`
+    : `<span class="text-gray-500">Not managed by VPM</span>`
 
-  const content = `
-    <div class="space-y-2 mt-2 text-sm">
-      <div>
-        <p class="text-xs text-gray-500">Port</p>
-        <p class="mono text-indigo-300 font-semibold">:${port}</p>
+  el.innerHTML = `
+    <button id="sp-back" class="text-xs text-gray-400 hover:text-gray-200 mb-3 transition-colors">← Back to list</button>
+    <div class="rounded-lg border border-gray-800 bg-gray-900/40 p-4 space-y-3">
+      <div class="flex items-baseline gap-2">
+        <span class="mono text-lg font-bold text-indigo-300">:${port}</span>
+        <span class="text-xs text-gray-600">${esc(shortBackend(backendId))}</span>
       </div>
-      <div>
-        <p class="text-xs text-gray-500">Process</p>
-        <p class="text-gray-100">${esc(processName || '?')} (PID ${pid})</p>
-      </div>
-      <div>
-        <p class="text-xs text-gray-500">Backend</p>
-        <p class="text-gray-100">${esc(shortBackend(backendId))}</p>
-      </div>
-      <div class="border-t border-gray-700 pt-2">
-        <p class="text-xs text-gray-500">VPM Status</p>
-        <p class="text-gray-100">${managerLabel}</p>
-      </div>
+      ${detailRow('Process', `${esc(processName || '?')} <span class="text-gray-500">(PID ${pid})</span>`)}
+      ${detailRow('VPM status', managerLabel)}
+    </div>
+    <div class="flex flex-wrap gap-2 justify-end mt-4">
+      ${managed
+        ? `<button id="sp-goto" class="btn-primary">Go to Project</button>`
+        : `<button id="sp-add" class="btn-primary">Add to Project…</button>
+           <button id="sp-new" class="btn-ghost">New Project…</button>`}
+      <button id="sp-kill" class="btn-red">Kill process</button>
     </div>
   `
 
-  const actions = managedServer
-    ? [
-        { label: 'Go to Project', value: 'goto', style: 'btn-primary' },
-        { label: 'Close', value: 'close', style: 'btn-ghost' },
-      ]
-    : [
-        { label: 'Add to Project…', value: 'add', style: 'btn-primary' },
-        { label: 'New Project…', value: 'new', style: 'btn-ghost' },
-        { label: 'Close', value: 'close', style: 'btn-ghost' },
-      ]
-
-  showModal({
-    title: `Port :${port}`,
-    message: '',
-    formContent: content,
-    actions,
-  }).then(async result => {
-    if (result === 'goto' && managedServer) {
-      setProjectFilter(managedServer.project.id)
+  document.getElementById('sp-back')?.addEventListener('click', () => refresh())
+  document.getElementById('sp-goto')?.addEventListener('click', () => {
+    if (managed) {
+      setProjectFilter(managed.project.id)
       document.querySelector('[data-nav="system-ports"]')?.click()
-    } else if (result === 'add') {
-      await addToExistingProject(port, processName)
-    } else if (result === 'new') {
-      await createNewProject(port, processName)
+    }
+  })
+  document.getElementById('sp-add')?.addEventListener('click', () => renderAddForm(info))
+  document.getElementById('sp-new')?.addEventListener('click', () => renderNewForm(info))
+  document.getElementById('sp-kill')?.addEventListener('click', async ev => {
+    const btn = ev.currentTarget
+    btn.textContent = 'killing…'
+    btn.disabled = true
+    try {
+      await KillByPort(port)
+    } catch (e) {
+      btn.textContent = 'failed'
+      return
+    }
+    _cachedEntries = null
+    refresh()
+  })
+}
+
+function detailRow(label, valueHTML) {
+  return `
+    <div>
+      <p class="text-[11px] uppercase tracking-wide text-gray-600">${label}</p>
+      <p class="text-sm text-gray-100">${valueHTML}</p>
+    </div>
+  `
+}
+
+// ── Add to existing project (inline form) ─────────────────────────────────────
+
+function renderAddForm(info) {
+  const el = body()
+  if (!el) return
+  const { port, processName, pid, backendId } = info
+  const projects = getProjects().filter(p => p.kind !== 'service')
+  const projectOptions = projects.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')
+
+  el.innerHTML = `
+    <button id="sp-back" class="text-xs text-gray-400 hover:text-gray-200 mb-3 transition-colors">← Back</button>
+    <h3 class="text-sm font-semibold text-gray-200 mb-2">Add :${port} to a project</h3>
+    <div class="space-y-2">
+      <select id="sp-project-select" class="input">${projectOptions}</select>
+      <div>
+        <input id="sp-server-name" type="text" placeholder="Server name (e.g. dev)" value="${esc(cleanName(processName))}" class="input">
+        <div id="sp-name-err" class="text-xs text-red-400 mt-0.5 hidden"></div>
+      </div>
+      ${cmdField()}
+    </div>
+    <div class="flex gap-2 justify-end mt-4">
+      <button id="sp-cancel" class="btn-ghost">Cancel</button>
+      <button id="sp-register" class="btn-primary">Register</button>
+    </div>
+  `
+
+  wireCmdField(pid, backendId)
+  document.getElementById('sp-back')?.addEventListener('click', () => showDetail(info))
+  document.getElementById('sp-cancel')?.addEventListener('click', () => showDetail(info))
+  document.getElementById('sp-register')?.addEventListener('click', async () => {
+    const projectId = document.getElementById('sp-project-select')?.value
+    const name = document.getElementById('sp-server-name')?.value?.trim()
+    const command = document.getElementById('sp-server-cmd')?.value?.trim()
+    if (!fieldRequired('sp-server-name', 'sp-name-err', name, 'Server name is required.')) return
+    if (!projectId) return
+
+    try {
+      await AddServer(projectId, { id: '', name, command: command || '', port, autostart: false, autorestart: false })
+      await refreshProjects()
+      _cachedEntries = null
+      await refresh()
+      toast(`":${port}" registered${command ? '' : ' (monitor-only)'}.`)
+    } catch (e) {
+      showFieldErr('sp-name-err', e?.message || 'Registration failed')
     }
   })
 }
 
-async function addToExistingProject(port, processName) {
-  const projects = getProjects()
-  const projectOptions = projects.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')
+// ── New project (inline form) ─────────────────────────────────────────────────
 
-  const result = await showModal({
-    title: 'Add to Project',
-    message: '',
-    formContent: `
-      <div class="space-y-2 mt-2">
-        <select id="sp-project-select" class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
-          ${projectOptions}
-        </select>
-        <input id="sp-server-name" type="text" placeholder="Server name (e.g. dev)" value="${esc(processName || 'server')}"
-          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
-        <input id="sp-server-cmd" type="text" placeholder="Command (e.g. npm run dev)"
-          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 mono text-sm text-gray-100">
+function renderNewForm(info) {
+  const el = body()
+  if (!el) return
+  const { port, processName, pid, backendId } = info
+
+  el.innerHTML = `
+    <button id="sp-back" class="text-xs text-gray-400 hover:text-gray-200 mb-3 transition-colors">← Back</button>
+    <h3 class="text-sm font-semibold text-gray-200 mb-2">New project for :${port}</h3>
+    <div class="space-y-2">
+      <div>
+        <input id="sp-proj-path" type="text" placeholder="Project path (e.g. C:\\projects\\myapp)" class="input">
+        <div id="sp-path-err" class="text-xs text-red-400 mt-0.5 hidden"></div>
       </div>
-    `,
-    actions: [
-      { label: 'Cancel', value: 'cancel', style: 'btn-ghost' },
-      { label: 'Register', value: 'register', style: 'btn-primary' },
-    ],
-  })
-
-  if (result !== 'register') return
-
-  const projectId = document.getElementById('sp-project-select')?.value
-  const name = document.getElementById('sp-server-name')?.value?.trim()
-  const command = document.getElementById('sp-server-cmd')?.value?.trim()
-
-  if (!projectId || !name || !command) {
-    await showError('Incomplete', 'Project, name, and command are required.')
-    return
-  }
-
-  try {
-    await AddServer(projectId, { id: '', name, command, port, autostart: false, autorestart: false })
-    await refreshProjects()
-    await showModal({ title: 'Registered', message: `Server ":${port}" added to project.` })
-  } catch (e) {
-    await showError('Registration failed', e?.message)
-  }
-}
-
-async function createNewProject(port, processName) {
-  const result = await showModal({
-    title: 'New Project',
-    message: 'Register this port as a new project.',
-    formContent: `
-      <div class="space-y-2 mt-2">
-        <input id="sp-proj-path" type="text" placeholder="Project path (e.g. C:\\projects\\myapp)"
-          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
-        <input id="sp-proj-name" type="text" placeholder="Project name"
-          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
-        <input id="sp-server-name2" type="text" placeholder="Server name" value="${esc(processName || 'server')}"
-          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-gray-100">
-        <input id="sp-server-cmd2" type="text" placeholder="Command (e.g. npm run dev)"
-          class="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 mono text-sm text-gray-100">
+      <div>
+        <input id="sp-proj-name" type="text" placeholder="Project name" class="input">
+        <div id="sp-pname-err" class="text-xs text-red-400 mt-0.5 hidden"></div>
       </div>
-    `,
-    actions: [
-      { label: 'Cancel', value: 'cancel', style: 'btn-ghost' },
-      { label: 'Create', value: 'create', style: 'btn-primary' },
-    ],
+      <div>
+        <input id="sp-server-name" type="text" placeholder="Server name" value="${esc(cleanName(processName))}" class="input">
+        <div id="sp-name-err" class="text-xs text-red-400 mt-0.5 hidden"></div>
+      </div>
+      ${cmdField()}
+    </div>
+    <div class="flex gap-2 justify-end mt-4">
+      <button id="sp-cancel" class="btn-ghost">Cancel</button>
+      <button id="sp-create" class="btn-primary">Create</button>
+    </div>
+  `
+
+  wireCmdField(pid, backendId)
+  document.getElementById('sp-back')?.addEventListener('click', () => showDetail(info))
+  document.getElementById('sp-cancel')?.addEventListener('click', () => showDetail(info))
+  document.getElementById('sp-create')?.addEventListener('click', async () => {
+    const path = document.getElementById('sp-proj-path')?.value?.trim()
+    const projName = document.getElementById('sp-proj-name')?.value?.trim()
+    const srvName = document.getElementById('sp-server-name')?.value?.trim()
+    const command = document.getElementById('sp-server-cmd')?.value?.trim()
+
+    let ok = true
+    ok = fieldRequired('sp-proj-path', 'sp-path-err', path, 'Project path is required.') && ok
+    ok = fieldRequired('sp-proj-name', 'sp-pname-err', projName, 'Project name is required.') && ok
+    ok = fieldRequired('sp-server-name', 'sp-name-err', srvName, 'Server name is required.') && ok
+    if (!ok) return
+
+    try {
+      const proj = await AddProject(path, projName, null)
+      await AddServer(proj.id, { id: '', name: srvName, command: command || '', port, autostart: false, autorestart: false })
+      await refreshProjects()
+      setProjectFilter(proj.id)
+      _cachedEntries = null
+      await refresh()
+      toast(`Project "${esc(projName)}" created on :${port}${command ? '' : ' (monitor-only)'}.`)
+    } catch (e) {
+      showFieldErr('sp-path-err', e?.message || 'Creation failed')
+    }
   })
-
-  if (result !== 'create') return
-
-  const path = document.getElementById('sp-proj-path')?.value?.trim()
-  const projName = document.getElementById('sp-proj-name')?.value?.trim()
-  const srvName = document.getElementById('sp-server-name2')?.value?.trim()
-  const srvCmd = document.getElementById('sp-server-cmd2')?.value?.trim()
-
-  if (!path || !projName || !srvName || !srvCmd) {
-    await showError('Incomplete', 'All fields are required.')
-    return
-  }
-
-  try {
-    const proj = await AddProject(path, projName, null)
-    await AddServer(proj.id, { id: '', name: srvName, command: srvCmd, port, autostart: false, autorestart: false })
-    await refreshProjects()
-    setProjectFilter(proj.id)
-    await showModal({ title: 'Created', message: `Project "${projName}" created with server on port :${port}.` })
-  } catch (e) {
-    await showError('Creation failed', e?.message)
-  }
 }
 
-async function refreshProjects() {
-  try {
-    const projects = await ListProjects()
-    const { setProjects } = await import('../store.js')
-    setProjects(projects ?? [])
-  } catch (_) {}
+// ── Command field (auto-detect from the listening process) ────────────────────
+
+function cmdField() {
+  return `
+    <div>
+      <div class="flex gap-1.5">
+        <input id="sp-server-cmd" type="text" placeholder="Command — blank to monitor only" class="input mono flex-1">
+        <button id="sp-detect" type="button" class="btn-xs btn-gray shrink-0 whitespace-nowrap" title="Detect from running process">🔍 Detect</button>
+      </div>
+      <p class="text-[11px] text-gray-600 mt-0.5">Leave blank to track the port without a start command.</p>
+    </div>
+  `
 }
+
+function wireCmdField(pid, backendId) {
+  const detect = async () => {
+    const input = document.getElementById('sp-server-cmd')
+    const btn = document.getElementById('sp-detect')
+    if (!input) return
+    const prev = btn ? btn.textContent : ''
+    if (btn) { btn.textContent = '…'; btn.disabled = true }
+    try {
+      const cmd = await GetProcessCommand(pid, backendId)
+      if (cmd && !input.value.trim()) input.value = cmd
+    } catch (_) { /* unknown — leave blank for monitor-only */ }
+    if (btn) { btn.textContent = prev; btn.disabled = false }
+  }
+  document.getElementById('sp-detect')?.addEventListener('click', detect)
+  detect() // auto-fill once on open
+}
+
+// ── Kill (list row) ───────────────────────────────────────────────────────────
 
 function onKillClick(btn) {
   const slot = btn.closest('.kill-slot')
@@ -261,6 +318,53 @@ function onKillClick(btn) {
     _cachedEntries = null
     await refresh()
   })
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+async function refreshProjects() {
+  try {
+    const projects = await ListProjects()
+    const { setProjects } = await import('../store.js')
+    setProjects(projects ?? [])
+  } catch (_) {}
+}
+
+// fieldRequired shows/clears an inline error and returns whether the value is set.
+function fieldRequired(inputId, errId, value, msg) {
+  if (!value) { showFieldErr(errId, msg); markInvalid(inputId, true); return false }
+  hideFieldErr(errId); markInvalid(inputId, false)
+  return true
+}
+
+function showFieldErr(errId, msg) {
+  const el = document.getElementById(errId)
+  if (el) { el.textContent = msg; el.classList.remove('hidden') }
+}
+function hideFieldErr(errId) {
+  const el = document.getElementById(errId)
+  if (el) el.classList.add('hidden')
+}
+function markInvalid(inputId, bad) {
+  const el = document.getElementById(inputId)
+  if (el) el.classList.toggle('border-red-500', bad)
+}
+
+// toast shows a transient confirmation at the bottom of #sp-body.
+function toast(msg) {
+  const el = body()
+  if (!el) return
+  const t = document.createElement('div')
+  t.className = 'mt-2 text-xs text-green-400 bg-green-900/30 border border-green-800/50 rounded px-2 py-1'
+  t.innerHTML = msg
+  el.appendChild(t)
+  setTimeout(() => t.remove(), 3000)
+}
+
+// cleanName turns "node.exe (PID 1234)" / "node.exe" into a tidy default name.
+function cleanName(processName) {
+  if (!processName) return 'server'
+  return processName.replace(/\.exe$/i, '').replace(/\s*\(PID.*\)$/i, '').trim() || 'server'
 }
 
 function shortBackend(id) {

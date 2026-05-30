@@ -29,3 +29,6 @@ func (w *wslStub) ScanListenPorts() ([]ListenEntry, error) {
 func (w *wslStub) ResolveTreePort(_ int) (int, error) {
 	return 0, fmt.Errorf("wsl: unsupported")
 }
+func (w *wslStub) ResolveProcessCommand(_ int) (string, error) {
+	return "", fmt.Errorf("wsl: unsupported")
+}

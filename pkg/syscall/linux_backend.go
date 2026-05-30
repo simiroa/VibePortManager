@@ -29,3 +29,6 @@ func (l *linuxBackend) ScanListenPorts() ([]ListenEntry, error) {
 	return nil, fmt.Errorf("linux-native: not implemented")
 }
 func (l *linuxBackend) ResolveTreePort(_ int) (int, error) { return 0, nil }
+func (l *linuxBackend) ResolveProcessCommand(_ int) (string, error) {
+	return "", fmt.Errorf("linux-native: not implemented")
+}

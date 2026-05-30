@@ -436,12 +436,24 @@ function _openCardMenu(triggerBtn, serverID, projectID) {
   `
 
   document.body.appendChild(menu)
+
   const close = ev => {
     if (!menu.contains(ev.target) && ev.target !== triggerBtn) {
       menu.remove()
       document.removeEventListener('click', close, true)
     }
   }
+
+  // Menu is in document.body (outside _el), so delegation won't reach handleAction.
+  // Wire a direct handler that cleans up and dispatches into handleAction.
+  menu.addEventListener('click', ev => {
+    const btn = ev.target.closest('[data-action]')
+    if (!btn) return
+    menu.remove()
+    document.removeEventListener('click', close, true)
+    handleAction(ev)
+  })
+
   setTimeout(() => document.addEventListener('click', close, true), 0)
 }
 

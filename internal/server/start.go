@@ -45,6 +45,12 @@ func (m *Manager) Start(
 	onCollision func(CollisionEvent),
 	onLog logbuf.Flush,
 ) error {
+	// Guard: monitor-only server (no start command). VPM only tracks its port;
+	// it doesn't own the process, so there's nothing to spawn.
+	if strings.TrimSpace(srv.Command) == "" {
+		return fmt.Errorf("server %q is monitor-only (no start command)", srv.Name)
+	}
+
 	// Guard: already transitioning.
 	cur := m.GetState(srv.ID)
 	if cur == StateStarting || cur == StateStopping {
@@ -157,7 +163,7 @@ func (m *Manager) registerRestart(serverID string) bool {
 // On WSL/Linux, Wait() only works for direct children; if the WSL backend uses exec.Cmd.Start()
 // internally and stores the *os.Process in the Handle, wire it here. For now we fall back to
 // a 1-second poll via ResolvePortOwner when os.FindProcess.Wait fails immediately.
-func (m *Manager) watchExit(serverID string, h vmsys.Handle, b vmsys.Backend, buf *logbuf.Buffer, logFile interface{ Close() error }, proj config.Project, srv config.Server, onState func(StateEvent), onCollision func(CollisionEvent), onLog logbuf.Flush) {
+func (m *Manager) watchExit(serverID string, h vmsys.Handle, _ vmsys.Backend, buf *logbuf.Buffer, logFile interface{ Close() error }, proj config.Project, srv config.Server, onState func(StateEvent), onCollision func(CollisionEvent), onLog logbuf.Flush) {
 	if h.PID > 0 {
 		if proc, err := os.FindProcess(h.PID); err == nil {
 			// Wait blocks until the OS process terminates (Windows: WaitForSingleObject).
@@ -243,9 +249,4 @@ func (mw multiWriter) Write(p []byte) (int, error) {
 	}
 	mw.b.Write(p) //nolint: ignore secondary error
 	return n, nil
-}
-
-// placeholderWarning checks if {PORT} is absent from cmd.
-func placeholderWarning(cmd string) bool {
-	return !strings.Contains(cmd, "{PORT}")
 }

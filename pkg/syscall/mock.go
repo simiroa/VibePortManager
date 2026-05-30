@@ -38,6 +38,8 @@ type MockExecutor struct {
 	ListenErr    error
 	TreePort     int   // returned by ResolveTreePort
 	TreePortErr  error
+	CmdByPID     map[int]string // pid -> command line; returned by ResolveProcessCommand
+	CmdErr       error
 
 	// Call records (read after test).
 	SpawnCalls  []SpawnCall
@@ -98,6 +100,18 @@ func (m *MockExecutor) ResolveTreePort(_ int) (int, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return m.TreePort, m.TreePortErr
+}
+
+func (m *MockExecutor) ResolveProcessCommand(pid int) (string, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.CmdErr != nil {
+		return "", m.CmdErr
+	}
+	if m.CmdByPID == nil {
+		return "", nil
+	}
+	return m.CmdByPID[pid], nil
 }
 
 // Reset clears all call records (keeps injected responses).

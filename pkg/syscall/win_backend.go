@@ -247,6 +247,21 @@ func (w *winBackend) ResolveTreePort(rootPID int) (int, error) {
 	return 0, nil
 }
 
+// ResolveProcessCommand returns the full command line for a PID via a CIM query.
+// PowerShell's Get-CimInstance is reliable on Win10/11 (unlike the deprecated
+// wmic). Returns "" (no error) when the PID is gone or the command line is empty.
+func (w *winBackend) ResolveProcessCommand(pid int) (string, error) {
+	if pid <= 0 {
+		return "", nil
+	}
+	script := fmt.Sprintf("(Get-CimInstance Win32_Process -Filter \"ProcessId=%d\").CommandLine", pid)
+	out, err := hiddenExec("powershell", "-NoProfile", "-NonInteractive", "-Command", script).Output()
+	if err != nil {
+		return "", nil // process may have exited or access denied — treat as unknown
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
 // descendantPIDs returns rootPID plus every descendant PID, via a Toolhelp
 // process snapshot (one syscall, no external process).
 func descendantPIDs(root int) (map[int]bool, error) {

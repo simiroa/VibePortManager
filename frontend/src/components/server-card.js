@@ -14,6 +14,7 @@ export function renderServerListItem(srv, projectID) {
   const errMsg    = (state === 'ERROR' || collision) ? getServerError(srv.id) : null
   const uptime    = running ? _formatUptime(getServerStartTime(srv.id)) : null
   const cmdHint   = srv.command ? _shortCmd(srv.command) : null
+  const monitorOnly = !srv.command
 
   // Status dot color
   const dotColor = state === 'RUNNING' ? 'bg-green-500'
@@ -49,18 +50,20 @@ export function renderServerListItem(srv, projectID) {
 
       <!-- Actions (hidden until hover) -->
       <div class="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        ${monitorOnly ? '' : `
         <button data-action="start" data-server-id="${esc(srv.id)}"
           ${running ? 'disabled' : ''} title="Start"
           class="w-5 h-5 flex items-center justify-center rounded text-gray-400 hover:text-green-400
-                 hover:bg-green-900/30 transition-colors text-sm ${running ? 'opacity-30' : ''}" disabled="${running}">▶</button>
+                 hover:bg-green-900/30 transition-colors text-sm ${running ? 'opacity-30' : ''}" disabled="${running}">▶</button>`}
         <button data-action="stop" data-server-id="${esc(srv.id)}"
-          ${!running ? 'disabled' : ''} title="Stop"
+          ${!running ? 'disabled' : ''} title="${monitorOnly ? 'Kill process on this port' : 'Stop'}"
           class="w-5 h-5 flex items-center justify-center rounded text-gray-400 hover:text-red-400
                  hover:bg-red-900/30 transition-colors text-sm ${!running ? 'opacity-30' : ''}" disabled="${!running}">■</button>
+        ${monitorOnly ? '' : `
         <button data-action="restart" data-server-id="${esc(srv.id)}"
           ${!running ? 'disabled' : ''} title="Restart"
           class="w-5 h-5 flex items-center justify-center rounded text-gray-400 hover:text-gray-300
-                 hover:bg-gray-700 transition-colors text-xs ${!running ? 'opacity-30' : ''}" disabled="${!running}">↺</button>
+                 hover:bg-gray-700 transition-colors text-xs ${!running ? 'opacity-30' : ''}" disabled="${!running}">↺</button>`}
         ${running ? `
           <button data-action="open-browser" data-server-id="${esc(srv.id)}" data-port="${srv.port}"
             title="Open in browser"
@@ -94,6 +97,7 @@ export function renderServerCard(srv, projectID) {
 
   const uptime  = running ? _formatUptime(getServerStartTime(srv.id)) : null
   const cmdHint = srv.command ? _shortCmd(srv.command) : null
+  const monitorOnly = !srv.command
 
   return `
     <div data-action="select-server" data-server-id="${esc(srv.id)}"
@@ -104,6 +108,7 @@ export function renderServerCard(srv, projectID) {
         <span class="shrink-0 text-xs px-1.5 py-0.5 rounded border ${badgeClass} flex items-center gap-1">
           ${busy ? _spinnerSvg() : ''}<span>${state}</span>
         </span>
+        ${monitorOnly ? `<span class="shrink-0 text-[10px] px-1.5 py-0.5 rounded border border-gray-700/60 text-gray-400 bg-gray-800/40" title="Tracked port — VPM does not own this process">external</span>` : ''}
         ${uptime ? `<span class="mono text-xs text-gray-600">${uptime}</span>` : ''}
         <div class="ml-auto relative">
           <button data-action="open-card-menu"
@@ -128,15 +133,17 @@ export function renderServerCard(srv, projectID) {
 
       <!-- Lifecycle buttons -->
       <div class="flex gap-1.5 flex-wrap">
+        ${monitorOnly ? '' : `
         <button data-action="start" data-server-id="${esc(srv.id)}"
           ${running || busy ? 'disabled' : ''} title="Start"
-          class="btn-xs ${!running && !busy ? 'btn-green' : 'btn-disabled'}">▶ Start</button>
+          class="btn-xs ${!running && !busy ? 'btn-green' : 'btn-disabled'}">▶ Start</button>`}
         <button data-action="stop" data-server-id="${esc(srv.id)}"
-          ${!running || busy ? 'disabled' : ''} title="Stop"
+          ${!running || busy ? 'disabled' : ''} title="${monitorOnly ? 'Kill process on this port' : 'Stop'}"
           class="btn-xs ${running && !busy ? 'btn-red' : 'btn-disabled'}">■ Stop</button>
+        ${monitorOnly ? '' : `
         <button data-action="restart" data-server-id="${esc(srv.id)}"
           ${!running || busy ? 'disabled' : ''} title="Restart"
-          class="btn-xs ${running && !busy ? 'btn-gray' : 'btn-disabled'}">↺</button>
+          class="btn-xs ${running && !busy ? 'btn-gray' : 'btn-disabled'}">↺</button>`}
         ${running ? `
           <button data-action="open-browser" data-server-id="${esc(srv.id)}" data-port="${srv.port}"
             title="Open http://localhost:${srv.port} in browser"
